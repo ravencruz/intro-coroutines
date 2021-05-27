@@ -11,16 +11,24 @@ fun loadContributorsCallbacks(service: GitHubService, req: RequestData, updateRe
     service.getOrgReposCall(req.org).onResponse { responseRepos ->
         logRepos(req, responseRepos)
         val repos = responseRepos.bodyList()
-        val allUsers = mutableListOf<User>()
 
-        //val numberOfProcessed = AtomicInteger()
+        val allUsers = Collections.synchronizedList(mutableListOf<User>())
+
+        // comparando con el index
+        // . If the request processing the last repo returns faster than some prior requests (which is likely to happen),
+        // all the results for requests that take more time to process will be lost.
+
+        // One of the ways to fix this is to introduce an index and check whether
+        // we've processed all the repositories already
+        val numberOfProcessed = AtomicInteger()
+
         for ( (index, repo) in repos.withIndex()) {
             service.getRepoContributorsCall(req.org, repo.name).onResponse { responseUsers ->
                 logUsers(repo, responseUsers)
                 val users = responseUsers.bodyList()
                 allUsers += users
 
-                if (index == repos.lastIndex) {
+                if (numberOfProcessed.incrementAndGet() == repos.size) {
                     updateResults(allUsers.aggregate())
                 }
             }
