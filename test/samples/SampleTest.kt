@@ -1,9 +1,6 @@
 package samples
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 
@@ -37,6 +34,7 @@ class SampleTest {
     }
 
     suspend fun bar() = coroutineScope {
+        //launch(Dispatchers.Default) { //the job has not completed yet
         launch {
             delay(1000) // auto-advances without delay
             println("bar")       // executes eagerly when bar() is called
