@@ -15,7 +15,6 @@ suspend fun loadContributorsChannels(
                     .also { logRepos(req, it) }
                     .bodyList()
 
-
         val channel = Channel<List<User>>()
 
         for ( repo in repos) {
@@ -38,6 +37,5 @@ suspend fun loadContributorsChannels(
                 updateResults(allUser, it == repos.lastIndex)
             }
         //}
-
     }
 }
