@@ -151,6 +151,10 @@ interface Contributors: CoroutineScope {
         setLoadingStatus(text, status == IN_PROGRESS)
     }
 
+    /**
+     * With structured concurrency, we only need to cancel the parent coroutine and this automatically
+     * propagates cancellation to all the child coroutines.
+     */
     private fun Job.setUpCancellation() {
         // make active the 'cancel' button
         setActionsStatus(newLoadingEnabled = false, cancellationEnabled = true)
