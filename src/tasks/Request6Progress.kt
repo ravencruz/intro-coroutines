@@ -7,5 +7,28 @@ suspend fun loadContributorsProgress(
     req: RequestData,
     updateResults: suspend (List<User>, completed: Boolean) -> Unit
 ) {
-    TODO()
+    val repos = service
+        .getOrgRepos(req.org)
+        .also { logRepos(req, it) }
+        .bodyList()
+
+//    var allUsers = emptyList<User>()
+//    repos.forEachIndexed { index, repo ->
+//        val repoUsers = service
+//            .getRepoContributors(req.org, repo.name)
+//            .also { logUsers(repo, it) }
+//            .bodyList()
+//        allUsers = (allUsers + repoUsers).aggregate()
+//        updateResults(allUsers, index == repos.lastIndex)
+//    }
+
+    var allUser = emptyList<User>()
+    for ( (index, repo) in repos.withIndex()) {
+        val users = service
+                    .getRepoContributors(req.org, repo.name)
+                    .also { logUsers(repo, it) }
+                    .bodyList()
+        allUser = (allUser + users).aggregate()
+        updateResults(allUser, index == repos.lastIndex)
+    }
 }

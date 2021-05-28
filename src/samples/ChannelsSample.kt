@@ -17,7 +17,7 @@ fun main() = runBlocking<Unit> {
     launch {
         repeat(3) {
             val x = channel.receive()
-            log(x)
+            log("received: $x")
         }
     }
 }
