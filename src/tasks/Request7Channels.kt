@@ -15,29 +15,29 @@ suspend fun loadContributorsChannels(
                     .also { logRepos(req, it) }
                     .bodyList()
 
-        var allUser = emptyList<User>()
+
         val channel = Channel<List<User>>()
 
         for ( repo in repos) {
             launch {
                 log("starting loading for ${repo.name}")
-                val users = service
-                    .getRepoContributors(req.org, repo.name)
-                    .also { logUsers(repo, it) }
-                    .bodyList()
 
-                allUser = (allUser + users).aggregate()
-                channel.send(allUser)
+                val users = service.getRepoContributors(req.org, repo.name)
+                            .also { logUsers(repo, it) }
+                            .bodyList()
+
+                channel.send(users)
             }
         }
 
-        launch {
+        var allUser = emptyList<User>()
+        //launch {
             repeat(repos.size) {
                 val users = channel.receive()
-                log("received: $users")
-                updateResults(users, it == repos.lastIndex)
+                allUser = (allUser + users).aggregate()
+                updateResults(allUser, it == repos.lastIndex)
             }
-        }
+        //}
 
     }
 }
